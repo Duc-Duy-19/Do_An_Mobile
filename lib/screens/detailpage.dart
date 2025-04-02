@@ -1,5 +1,5 @@
-import 'package:doan_mobile/screens/cartpage.dart';
-import 'package:doan_mobile/screens/homepage.dart';
+import 'package:do_an_mobile/screens/cartpage.dart';
+import 'package:do_an_mobile/screens/homepage.dart';
 import 'package:flutter/material.dart';
 
 class Detailpage extends StatefulWidget {

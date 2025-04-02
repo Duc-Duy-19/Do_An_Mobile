@@ -1,4 +1,4 @@
-package com.example.doan_mobile
+package com.example.do_an_mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

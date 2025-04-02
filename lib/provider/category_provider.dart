@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:doan_mobile/model/product.dart';
+import 'package:do_an_mobile/model/product.dart';
 import 'package:flutter/material.dart';
 
 class CategoryProvider with ChangeNotifier{

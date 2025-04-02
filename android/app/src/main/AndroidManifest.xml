@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="doan_mobile"
+        android:label="do_an_mobile"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

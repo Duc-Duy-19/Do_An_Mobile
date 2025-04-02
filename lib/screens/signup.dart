@@ -1,10 +1,6 @@
-import 'package:doan_mobile/screens/login.dart';
-import 'package:doan_mobile/widgets/mybutton.dart';
-import 'package:doan_mobile/widgets/mytextformField.dart';
-import 'package:doan_mobile/widgets/passwordtextformField.dart';
 import 'package:flutter/material.dart';
-import 'package:doan_mobile/widgets/changeScreens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:do_an_mobile/screens/login.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -13,34 +9,32 @@ class SignUp extends StatefulWidget {
   State<SignUp> createState() => _SignUpState();
 }
 
-final RegExp regExp = RegExp(p);
-  String email = "";
-  String password = ""; // Sửa "Password" thành "password" cho nhất quán
-  String username = ""; // Sửa "Username" thành "username" cho nhất quán
-  String sdt = ""; // Sửa "SDT" thành "sdt" cho nhất quán
-  bool obserText = true;
-  final String p =
-    r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-
-
 class _SignUpState extends State<SignUp> {
-final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-final GlobalKey<ScaffoldState> _scaffoldstate = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool obserText = true;
+  String email = "";
+  String password = "";
+  String username = "";
+  String phone = "";
 
+  static const String emailPattern =
+      r'^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com)$';
+  final RegExp emailRegExp = RegExp(emailPattern);
 
-
-  Future<void> validation() async { // Sửa "vaildation" thành "validation"
+  Future<void> validation() async {
     final FormState? _form = _formKey.currentState;
     if (_form!.validate()) {
       try {
-        UserCredential result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Đăng ký thành công!")),
         );
-        print("UID: ${result.user!.uid}");
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (ctx) => Login()),
+        );
       } on FirebaseAuthException catch (e) {
         String errorMessage;
         switch (e.code) {
@@ -51,20 +45,13 @@ final GlobalKey<ScaffoldState> _scaffoldstate = GlobalKey<ScaffoldState>();
             errorMessage = "Email không hợp lệ.";
             break;
           case 'weak-password':
-            errorMessage = "Mật khẩu quá yếu (ít nhất 6 ký tự).";
-            break;
-          case 'operation-not-allowed':
-            errorMessage = "Tài khoản email/mật khẩu bị vô hiệu hóa.";
+            errorMessage = "Mật khẩu quá yếu (ít nhất 8 ký tự).";
             break;
           default:
             errorMessage = "Lỗi: ${e.message}";
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Lỗi không xác định: $e")),
         );
       }
     } else {
@@ -74,143 +61,156 @@ final GlobalKey<ScaffoldState> _scaffoldstate = GlobalKey<ScaffoldState>();
     }
   }
 
-  Widget _buildAllTextFormFields() {
-    return Container(
-      height: 300,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          MyTextFormField(
-            name: 'Email',
-            onChanged: (value) {
-              setState(() {
-                email = value; // Gán value cho email
-              });
-            },
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Vui lòng nhập email';
-              } else if (!regExp.hasMatch(value)) {
-                return 'Email không hợp lệ';
-              }
-              return null;
-            },
-          ),
-          MyTextFormField(
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Username không được để trống";
-              } else if (value.length < 6) {
-                return "Username phải lớn hơn 6 ký tự";
-              }
-              return null;
-            },
-            name: "Username",
-            onChanged: (value) {
-              setState(() {
-                username = value; // Gán value cho username
-              });
-            },
-          ),
-          PasswordTextFormField(
-            obserText: obserText,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Vui lòng nhập mật khẩu';
-              } else if (value.length < 8) {
-                return 'Mật khẩu phải lớn hơn 8 ký tự';
-              }
-              return null;
-            },
-            name: "Password",
-            onChanged: (value) {
-              setState(() {
-                password = value; // Gán value cho password
-              });
-            },
-            onTap: () {
-              FocusScope.of(context).unfocus();
-              setState(() {
-                obserText = !obserText;
-              });
-            },
-          ),
-          MyTextFormField(
-            name: "SDT",
-            onChanged: (value) {
-              setState(() {
-                sdt = value; // Gán value cho sdt
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "SDT không được để trống";
-              } else if (value.length != 10) {
-                return "SDT phải có đúng 10 số";
-              }
-              return null;
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildButton() {
-    return Container(
-      height: 400,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          _buildAllTextFormFields(),
-          MyButton(onPressed: validation, name: "Đăng Ký"),
-          ChangeScreens(
-            name: "Đăng Nhập",
-            whichaccount: "Bạn đã có tài khoản?",
-            onTap: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (ctx) =>  Login()),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldstate,
-      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,  // Thay đổi màu nền thành trắng
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: Container(
-            child: Column(
-              children: <Widget>[
-                Container(
-                  height: 220,
-                  width: double.infinity,
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text(
-                        'Đăng Ký',
-                        style: TextStyle(
-                          fontSize: 50,
-                          fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 60),
+              Text(
+                'Đăng Ký',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[700],  // Màu chữ chính là xám
+                ),
+              ),
+              const SizedBox(height: 20),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                elevation: 5,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: "Email",
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Vui lòng nhập email';
+                            } else if (!emailRegExp.hasMatch(value)) {
+                              return 'Email không hợp lệ';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) => email = value,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: "Username",
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Username không được để trống';
+                            } else if (value.length < 6) {
+                              return 'Username phải lớn hơn 6 ký tự';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) => username = value,
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          obscureText: obserText,
+                          decoration: InputDecoration(
+                            labelText: "Mật khẩu",
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(obserText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () => setState(() => obserText = !obserText),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Vui lòng nhập mật khẩu';
+                            } else if (value.length < 8) {
+                              return 'Mật khẩu phải lớn hơn 8 ký tự';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) => password = value,
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: "Số Điện Thoại",
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Số điện thoại không được để trống';
+                            } else if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+                              return 'Số điện thoại phải có đúng 10 chữ số';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) => phone = value,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                _buildButton(),
-              ],
-            ),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: validation,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.grey[600],  // Màu nền xám cho nút đăng ký
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 5,
+                  minimumSize: Size(double.infinity, 50),  // Đặt chiều rộng nút thành full
+                ),
+                child: const Text("Đăng Ký", style: TextStyle(fontSize: 18, color: Colors.white)),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Login()),
+                  );
+                },
+                child: const Text("Bạn đã có tài khoản? Đăng nhập ngay", style: TextStyle(color: Colors.grey)),
+              ),
+            ],
           ),
         ),
       ),

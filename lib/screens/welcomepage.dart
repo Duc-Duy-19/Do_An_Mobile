@@ -1,5 +1,5 @@
-import 'package:doan_mobile/screens/login.dart';
-import 'package:doan_mobile/screens/signup.dart';
+import 'package:do_an_mobile/screens/login.dart';
+import 'package:do_an_mobile/screens/signup.dart';
 import 'package:flutter/material.dart';
 
 class Welcomepage extends StatelessWidget {

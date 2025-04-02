@@ -1,6 +1,6 @@
-import 'package:doan_mobile/model/product.dart';
-import 'package:doan_mobile/screens/homepage.dart';
-import 'package:doan_mobile/widgets/importProduct.dart';
+import 'package:do_an_mobile/model/product.dart';
+import 'package:do_an_mobile/screens/homepage.dart';
+import 'package:do_an_mobile/widgets/importProduct.dart';
 import 'package:flutter/material.dart';
 
 class ListProduct extends StatelessWidget {

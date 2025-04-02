@@ -1,4 +1,4 @@
-import 'package:doan_mobile/screens/checkout.dart';
+import 'package:do_an_mobile/screens/checkout.dart';
 import 'package:flutter/material.dart';
 
 class CartPage extends StatefulWidget {

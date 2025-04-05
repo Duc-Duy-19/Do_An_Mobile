@@ -1,4 +1,5 @@
 import 'package:do_an_mobile/model/product.dart';
+import 'package:do_an_mobile/screens/detailpage.dart';
 import 'package:do_an_mobile/screens/homepage.dart';
 import 'package:do_an_mobile/widgets/importProduct.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,36 @@ class ListProduct extends StatelessWidget {
           children: <Widget>[
             Column(
               children:<Widget> [
+                Container(
+                  height: 700,
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.7,
+                    scrollDirection: Axis.vertical,
+                    children: snapShot.map((e) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) => Detailpage(
+                              image: e.image,
+                              name: e.name,
+                              price: e.price,
+                              description: e.description ?? "No description available", // Added description parameter
+                              
+                            ),
+                          ),
+                        );
+                      },
+                      child: Importproduct(
+                        price: e.price,
+                        image: e.image,
+                        name: e.name,
+                      ),
+                    )).toList(),
+                  ),
+                ),
+                
                 Container(
                   height: 50,
                   child: Column(

@@ -1,14 +1,13 @@
 {
   "project_info": {
     "project_number": "834219864810",
-    "firebase_url": "https://doan-mobile-2012f-default-rtdb.firebaseio.com",
     "project_id": "doan-mobile-2012f",
     "storage_bucket": "doan-mobile-2012f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:834219864810:android:13bfafff5c4d2b6b6b9d93",
+        "mobilesdk_app_id": "1:834219864810:android:938a454ca768a7376b9d93",
         "android_client_info": {
           "package_name": "com.example.do_an_mobile"
         }

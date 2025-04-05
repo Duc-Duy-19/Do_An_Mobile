@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:do_an_mobile/screens/login.dart';
+import 'package:do_an_mobile/widgets/mybutton.dart';
+import 'package:do_an_mobile/widgets/mytextformField.dart';
+import 'package:do_an_mobile/widgets/passwordtextformField.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -15,20 +19,39 @@ class _SignUpState extends State<SignUp> {
   String email = "";
   String password = "";
   String username = "";
-  String phone = "";
+  String phoneNumber = "";
+  bool isNam = true;
 
   static const String emailPattern =
       r'^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com)$';
   final RegExp emailRegExp = RegExp(emailPattern);
+  
 
   Future<void> validation() async {
     final FormState? _form = _formKey.currentState;
     if (_form!.validate()) {
       try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential result =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
+        // await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        //   email: email,
+        //   password: password,
+        // );
+
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(result.user!.uid)
+            .set({
+              "username": username,
+              "usererId": result.user!.uid,
+              "email": email,
+              "gioitinh": isNam ? "Nam" : "Nữ",
+              "phone": phoneNumber,
+            });
+        // Đăng ký thành công, hiển thị thông báo và chuyển hướng đến trang đăng nhập
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Đăng ký thành công!")),
         );
@@ -64,7 +87,7 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,  // Thay đổi màu nền thành trắng
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -77,7 +100,7 @@ class _SignUpState extends State<SignUp> {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],  // Màu chữ chính là xám
+                  color: Colors.grey[700],
                 ),
               ),
               const SizedBox(height: 20),
@@ -92,16 +115,8 @@ class _SignUpState extends State<SignUp> {
                     key: _formKey,
                     child: Column(
                       children: <Widget>[
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Email",
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                        MyTextFormField(
+                          name: "Email",
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Vui lòng nhập email';
@@ -113,16 +128,8 @@ class _SignUpState extends State<SignUp> {
                           onChanged: (value) => email = value,
                         ),
                         const SizedBox(height: 20),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Username",
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                        MyTextFormField(
+                          name: "Username",
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Username không được để trống';
@@ -134,23 +141,9 @@ class _SignUpState extends State<SignUp> {
                           onChanged: (value) => username = value,
                         ),
                         const SizedBox(height: 20),
-                        TextFormField(
-                          obscureText: obserText,
-                          decoration: InputDecoration(
-                            labelText: "Mật khẩu",
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(obserText
-                                  ? Icons.visibility
-                                  : Icons.visibility_off),
-                              onPressed: () => setState(() => obserText = !obserText),
-                            ),
-                          ),
+                        PasswordTextFormField(
+                          obserText: obserText,
+                          name: "Password",
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Vui lòng nhập mật khẩu';
@@ -160,18 +153,43 @@ class _SignUpState extends State<SignUp> {
                             return null;
                           },
                           onChanged: (value) => password = value,
+                          onTap: () {
+                            setState(() => obserText = !obserText);
+                          },
+                        ),
+
+                        Container(
+                          margin: const EdgeInsets.only(top: 20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Radio(
+                                value: true,
+                                groupValue: isNam,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isNam = value!;
+                                  });
+                                },
+                              ),
+                              const Text("Nam"),
+                              Radio(
+                                value: false,
+                                groupValue: isNam,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isNam = value!;
+                                  });
+                                },
+                              ),
+                              const Text("Nữ"),
+                            ],
+                          ),
+
                         ),
                         const SizedBox(height: 20),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Số Điện Thoại",
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                        MyTextFormField(
+                          name: "Số Điện Thoại",
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Số điện thoại không được để trống';
@@ -180,7 +198,7 @@ class _SignUpState extends State<SignUp> {
                             }
                             return null;
                           },
-                          onChanged: (value) => phone = value,
+                          onChanged: (value) => phoneNumber = value,
                         ),
                       ],
                     ),
@@ -188,17 +206,18 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
               const SizedBox(height: 30),
-              ElevatedButton(
+              MyButton(
                 onPressed: validation,
+                name: "Đăng Ký",
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.grey[600],  // Màu nền xám cho nút đăng ký
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Colors.grey[600],
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 5,
-                  minimumSize: Size(double.infinity, 50),  // Đặt chiều rộng nút thành full
+                  minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text("Đăng Ký", style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
               const SizedBox(height: 20),
               TextButton(
@@ -208,7 +227,10 @@ class _SignUpState extends State<SignUp> {
                     MaterialPageRoute(builder: (context) => Login()),
                   );
                 },
-                child: const Text("Bạn đã có tài khoản? Đăng nhập ngay", style: TextStyle(color: Colors.grey)),
+                child: const Text(
+                  "Bạn đã có tài khoản? Đăng nhập ngay",
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
             ],
           ),

@@ -9,7 +9,7 @@ class MyTextFormField extends StatelessWidget {
     super.key,
     required this.validator,
     required this.name,
-    required this.onChanged,
+    required this.onChanged, 
   });
 
   @override

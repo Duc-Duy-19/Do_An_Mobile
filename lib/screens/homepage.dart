@@ -1,11 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:do_an_mobile/model/usermodel.dart';
 import 'package:do_an_mobile/provider/category_provider.dart';
 import 'package:do_an_mobile/provider/product_provider.dart';
+import 'package:do_an_mobile/screens/cartpage.dart';
+import 'package:do_an_mobile/screens/checkout.dart';
 import 'package:do_an_mobile/screens/detailpage.dart';
 import 'package:do_an_mobile/screens/listproduct.dart';
 import 'package:do_an_mobile/screens/login.dart';
+import 'package:do_an_mobile/screens/profilepage.dart';
 import 'package:do_an_mobile/screens/welcomepage.dart';
 import 'package:do_an_mobile/widgets/importProduct.dart';
+import 'package:do_an_mobile/widgets/noficationShoppingcart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -29,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   bool homeColor = true;
   bool gioHangColor = false;
   bool AboutColor = false;
+  bool profileColor = false;
 
   @override
   void initState() {
@@ -46,6 +52,7 @@ class _HomePageState extends State<HomePage> {
     productProvider.getNewproductData();
     productProvider.getHomeFeatureproductData();
     productProvider.getHomeNewproductData();
+    productProvider.getUserData();
   }
 
   // Widget
@@ -61,74 +68,117 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMyDrawer() {
-    return Drawer(
-      child: Column(
-        children: <Widget>[
-          UserAccountsDrawerHeader(
-            currentAccountPicture: CircleAvatar(
-              backgroundImage: AssetImage("images/hinhuser.jpg"),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.black,
-            ),
-            accountName: Text(
-              "Nguyễn Đức Duy",
-              style: TextStyle(color: Colors.white),
-            ),
-            accountEmail: Text("duygacon19102004@gmail.com"),
-          ),
-          ListTile(
-            selected: homeColor,
-            onTap: () {
-              setState(() {
-                homeColor = true;
-                gioHangColor = false;
-                AboutColor = false;
-              });
-            },
-            leading: Icon(Icons.home),
-            title: Text("Home"),
-          ),
-          ListTile(
-            selected: gioHangColor,
-            onTap: () {
-              setState(() {
-                gioHangColor = true;
-                homeColor = false;
-                AboutColor = false;
-              });
-            },
-            leading: Icon(Icons.shopping_cart),
-            title: Text("Giỏ Hàng"),
-          ),
-          ListTile(
-            selected: AboutColor,
-            onTap: () {
-              setState(() {
-                AboutColor = true;
-                homeColor = false;
-                gioHangColor = false;
-              });
-            },
-            leading: Icon(Icons.info),
-            title: Text("About"),
-          ),
-          ListTile(
-            onTap: () async {
-              await FirebaseAuth.instance.signOut();
-               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => Welcomepage()),
-                (Route<dynamic> route) => false,
-              );
-            },
-            leading: Icon(Icons.exit_to_app),
-            title: Text("Đăng Xuất"),
-          ),
-        ],
+Widget _buidUserAcountDrawer() {
+  final productProvider = Provider.of<ProductProvider>(context);
+  List<UserModel> userModel = productProvider.UsermodeList;
+
+  return Column(
+    children: userModel.isEmpty
+  ? [
+      DrawerHeader(
+        child: Center(child: CircularProgressIndicator()),
       ),
-    );
-  }
+    ]
+  : userModel.map((e) {
+      return UserAccountsDrawerHeader(
+        currentAccountPicture: CircleAvatar(
+          backgroundImage: AssetImage("images/hinhuser.jpg"),
+        ),
+        decoration: BoxDecoration(
+          color: Colors.black,
+        ),
+        accountName: Text(
+          e.username,
+          style: TextStyle(color: Colors.white),
+        ),
+        accountEmail: Text(e.email), 
+      );
+    }).toList(),
+  );
+}
+
+
+Widget _buildMyDrawer() {
+  final productProvider = Provider.of<ProductProvider>(context);
+  final userModel = productProvider.getUserModel;
+
+  return Drawer(
+    child: Column(
+      children: <Widget>[
+        _buidUserAcountDrawer(),
+        ListTile(
+          selected: homeColor,
+          onTap: () {
+            setState(() {
+              homeColor = true;
+              gioHangColor = false;
+              AboutColor = false;
+              profileColor = false;
+            });
+          },
+          leading: Icon(Icons.home),
+          title: Text("Home"),
+        ),
+         ListTile(
+          selected: profileColor,
+          onTap: () {
+            setState(() {
+              homeColor = false;
+              gioHangColor = false;
+              AboutColor = false;
+              profileColor = true;
+            });
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => ProFilePage(),
+              ),
+            );
+          },
+          leading: Icon(Icons.info_rounded),
+          title: Text("Thông Tin Cá Nhân"),
+        ),
+        ListTile(
+          selected: gioHangColor,
+          onTap: () {
+            setState(() {
+              gioHangColor = true;
+              homeColor = false;
+              AboutColor = false;
+              profileColor = false;
+            });
+          },
+          leading: Icon(Icons.shopping_cart),
+          title: Text("Giỏ Hàng"),
+        ),
+        ListTile(
+          selected: AboutColor,
+          onTap: () {
+            setState(() {
+              AboutColor = true;
+              homeColor = false;
+              gioHangColor = false;
+              profileColor = false;
+            });
+          },
+          leading: Icon(Icons.info),
+          title: Text("About"),
+        ),
+        ListTile(
+          onTap: () async {
+            await FirebaseAuth.instance.signOut();
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => Welcomepage()),
+              (Route<dynamic> route) => false,
+            );
+          },
+          leading: Icon(Icons.exit_to_app),
+          title: Text("Đăng Xuất"),
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget _buildCategory(BuildContext context) {
     final categoryProvider = Provider.of<CategoryProvider>(context);
@@ -280,7 +330,7 @@ class _HomePageState extends State<HomePage> {
                           image: e.image,
                           name: e.name,
                           price: e.price,
-                          description: "• Chất liệu: Cotton 2 chiều.\n• Regular Fit.\n• Hình in mặt trước áo áp dụng công nghệ in lụa.",
+                          description: e.description ?? "No description available", // Added description parameter
                         ),
                       ),
                     );
@@ -343,7 +393,7 @@ class _HomePageState extends State<HomePage> {
                           image: e.image,
                           name: e.name,
                           price: e.price,
-                          description: "• Chất liệu: Cotton 2 chiều.\n• Regular Fit.\n• Hình in mặt trước áo áp dụng công nghệ in lụa.",
+                          description: e.description??"asd" , // Added description parameter
                         ),
                       ),
                     );
@@ -378,7 +428,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(icon: Icon(Icons.search, color: Colors.black), onPressed: () {}),
-          IconButton(icon: Icon(Icons.notifications_none, color: Colors.black), onPressed: () {}),
+          NoficationShoppingCart(),
         ],
       ),
       body: Padding(

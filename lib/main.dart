@@ -6,6 +6,7 @@ import 'package:do_an_mobile/screens/detailpage.dart';
 import 'package:do_an_mobile/screens/homepage.dart';
 import 'package:do_an_mobile/screens/listproduct.dart';
 import 'package:do_an_mobile/screens/login.dart';
+import 'package:do_an_mobile/screens/profilepage.dart';
 import 'package:do_an_mobile/screens/welcomepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ListenableProvider<CategoryProvider>(
           create: (ctx) => CategoryProvider(),
-        ),
+        ), 
         ListenableProvider<ProductProvider>(
           create: (ctx) => ProductProvider(),
         ),
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
           builder: (ctx, snapshot) {
             if (snapshot.hasData) {
               return HomePage();
+              //return ProFilePage();
             } else {
               return Welcomepage();
             }

@@ -1,57 +1,68 @@
 import 'package:do_an_mobile/screens/cartpage.dart';
 import 'package:do_an_mobile/screens/homepage.dart';
+import 'package:do_an_mobile/widgets/noficationShoppingcart.dart';
 import 'package:flutter/material.dart';
+import 'package:do_an_mobile/provider/product_provider.dart';
+import 'package:provider/provider.dart';
 
 class Detailpage extends StatefulWidget {
   final String image;
   final String name;
   final double price;
   final String description;
-   Detailpage({
+
+  const Detailpage({
     super.key,
-    required this.image, 
-    required this.name, 
-    required this.price, 
-    required this.description
-  }); 
+    required this.image,
+    required this.name,
+    required this.price,
+    required this.description,
+  });
+
   @override
   State<Detailpage> createState() => _DetailpageState();
 }
 
 class _DetailpageState extends State<Detailpage> {
   int count = 1;
-  Widget _buildSize({required String name}){
+
+  late ProductProvider productProvider;
+
+  Widget _buildSize({required String name}) {
     return Container(
       height: 60,
       width: 60,
       color: Colors.blueAccent,
       child: Center(
-        child: Text(name, style: TextStyle(fontSize: 17),),
+        child: Text(
+          name,
+          style: const TextStyle(fontSize: 17),
+        ),
       ),
     );
   }
 
-
-  final TextStyle myStyle = TextStyle(
+  final TextStyle myStyle = const TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
   );
 
-  Widget _buildImage(){
+  Widget _buildImage() {
     return Center(
       child: Container(
         width: 350,
         child: Card(
           color: Colors.grey[200],
           child: Container(
-            padding: EdgeInsets.all(15),
+            padding: const EdgeInsets.all(15),
             child: Container(
               height: 220,
-              decoration:BoxDecoration(
+              decoration: BoxDecoration(
                 image: DecorationImage(
                   fit: BoxFit.contain,
-                  image: NetworkImage(widget.image) ),
-              ) ,
+                  image: NetworkImage(widget.image),
+                ),
+              ),
             ),
           ),
         ),
@@ -59,40 +70,48 @@ class _DetailpageState extends State<Detailpage> {
     );
   }
 
-  Widget _buildInfProduct(){
+  Widget _buildInfProduct() {
+    String formattedDescription = widget.description.replaceAll('\\n', '\n');
+
     return Container(
-      height: 200,
+      padding: const EdgeInsets.all(10),
       color: Colors.white,
-      child: Row(
-        children:<Widget> [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(widget.name, style: myStyle),
+          const SizedBox(height: 5),
+          Text("\$ ${widget.price.toString()}",
+              style: const TextStyle(fontSize: 18)),
+          const SizedBox(height: 10),
+          Text("Chi Tiết", style: myStyle),
+          const SizedBox(height: 5),
           Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget> [
-              Text(widget.name, style: myStyle),
-              Text("\$ ${widget.price.toString()}", style: TextStyle(fontSize: 18),),
-              Text("Chi Tiết", style: myStyle),
-              Text(widget.description, style: TextStyle(fontSize: 16),),
-            ],
+            children: formattedDescription
+                .split('\n')
+                .map((line) => Text(line, style: const TextStyle(fontSize: 16)))
+                .toList(),
           ),
         ],
       ),
     );
   }
-  Widget _buildSizes(){
+
+  Widget _buildSizes() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:<Widget> [
-        Text('Size', style: myStyle,),
+      children: <Widget>[
+        Text('Size', style: myStyle),
         Container(
           width: 300,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              _buildSize(name:  "S"),
-              _buildSize(name:  "M"),
-              _buildSize(name:  "L"),
-              _buildSize(name:  "XL"),
+              _buildSize(name: "S"),
+              _buildSize(name: "M"),
+              _buildSize(name: "L"),
+              _buildSize(name: "XL"),
             ],
           ),
         ),
@@ -100,11 +119,11 @@ class _DetailpageState extends State<Detailpage> {
     );
   }
 
-  Widget _buildSlPart(){
+  Widget _buildSlPart() {
     return Column(
       children: <Widget>[
-        Text("Số lượng", style: myStyle,),
-        SizedBox(height: 10),
+        Text("Số lượng", style: myStyle),
+        const SizedBox(height: 10),
         Container(
           height: 40,
           width: 100,
@@ -114,21 +133,25 @@ class _DetailpageState extends State<Detailpage> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children:<Widget> [
+            children: <Widget>[
               GestureDetector(
-                child: Icon(Icons.remove),
-                onTap: (){setState(() {
-                  if(count >= 1){
-                    count--;
-                  }
-                });},   
+                child: const Icon(Icons.remove),
+                onTap: () {
+                  setState(() {
+                    if (count >= 1) {
+                      count--;
+                    }
+                  });
+                },
               ),
-              Text(count.toString(), style: TextStyle(fontSize: 18),),
+              Text(count.toString(), style: const TextStyle(fontSize: 18)),
               GestureDetector(
-                child: Icon(Icons.add),
-                onTap: (){setState(() {
-                  count++;
-                });},
+                child: const Icon(Icons.add),
+                onTap: () {
+                  setState(() {
+                    count++;
+                  });
+                },
               ),
             ],
           ),
@@ -136,74 +159,80 @@ class _DetailpageState extends State<Detailpage> {
       ],
     );
   }
-  
-  Widget _buildButton(){
+
+  Widget _buildButton() {
     return Column(
-      children:<Widget> [
+      children: <Widget>[
         Center(
           child: Container(
             height: 50,
             child: ElevatedButton(
-              onPressed: (){
-                Navigator.of(context).pushReplacement(
+              onPressed: () {
+                productProvider.addNotificationShoppingCart(
+                    " Thêm vào giỏ hàng thành công");
+                productProvider.addNotificationShoppingCart(
+                    "Sản phẩm ${widget.name} đã được thêm vào giỏ hàng");
+                productProvider.getCheckOutCartData(
+                  name: widget.name,
+                  image: widget.image,
+                  quantity: count, // Sửa quentity thành quantity
+                  price: widget.price,
+                );
+                Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (ctx) => CartPage(
-                      image: widget.image,
-                      name: widget.name,
-                      price: widget.price,
-                    ),
+                    builder: (ctx) => const CartPage(),
                   ),
                 );
-              }, 
-              child: Text("Thêm vào giỏ hàng"),
+              },
+              child: const Text("Thêm vào giỏ hàng"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.lightBlue,
-              )),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
+
   @override
   Widget build(BuildContext context) {
+    productProvider = Provider.of<ProductProvider>(context);
     return Scaffold(
-      
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Chi tiết sản phẩm", style: TextStyle(color: Colors.black),),
+        title: const Text(
+          "Chi tiết sản phẩm",
+          style: TextStyle(color: Colors.black),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        actions:<Widget> [
-          IconButton(
-            icon: Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {
-              // Navigate to cart page
-            },
-          ),
+        actions: const <Widget>[
+          NoficationShoppingCart(),
         ],
       ),
       body: Container(
         child: ListView(
-          children:<Widget> [
+          children: <Widget>[
             _buildImage(),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget> [
+                children: <Widget>[
                   _buildInfProduct(),
-                   SizedBox( height: 20),
+                  const SizedBox(height: 20),
                   _buildSizes(),
-                   SizedBox( height: 20),
+                  const SizedBox(height: 20),
                   _buildSlPart(),
-                  SizedBox( height: 20),
+                  const SizedBox(height: 20),
                   _buildButton(),
                 ],
               ),

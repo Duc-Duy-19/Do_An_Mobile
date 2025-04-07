@@ -1,96 +1,135 @@
-# Ứng Dụng Thương Mại Điện Tử | E-commerce Mobile App
+# Dirty Coins - Ứng Dụng Shop Quần Áo
 
-## Cấu Trúc Thư Mục | Project Structure
+## 📱 Tổng Quan
+Ứng dụng thương mại điện tử được xây dựng bằng Flutter và Firebase, cho phép người dùng dễ dàng tìm kiếm và mua sắm quần áo, phụ kiện thời trang.
 
+## 📂 Cấu Trúc Project
 ```
 lib/
-├── model/
-│   └── product.dart              # Model sản phẩm
-├── provider/
-│   ├── category_provider.dart    # Provider quản lý danh mục
-│   └── product_provider.dart     # Provider quản lý sản phẩm
-├── screens/
-│   ├── cartpage.dart            # Màn hình giỏ hàng
-│   ├── checkout.dart            # Màn hình thanh toán
-│   ├── detailpage.dart          # Màn hình chi tiết sản phẩm
-│   ├── homepage.dart            # Màn hình trang chủ
-│   ├── listproduct.dart         # Màn hình danh sách sản phẩm
-│   ├── login.dart               # Màn hình đăng nhập
-│   ├── signup.dart              # Màn hình đăng ký
-│   └── welcomepage.dart         # Màn hình chào mừng
-├── widgets/
-│   ├── changeScreens.dart       # Widget chuyển màn hình
-│   ├── importProduct.dart       # Widget hiển thị sản phẩm
-│   ├── mybutton.dart           # Widget nút tùy chỉnh
-│   ├── mytextformField.dart    # Widget form nhập liệu
-│   └── passwordtextformField.dart # Widget nhập mật khẩu
-├── firebase_options.dart        # Cấu hình Firebase
-└── main.dart                    # File khởi động ứng dụng
+├── model/                    # Data Models
+│   ├── cartmodel.dart       # Model giỏ hàng
+│   ├── product.dart         # Model sản phẩm  
+│   └── usermodel.dart       # Model người dùng
+│
+├── provider/                 # State Management
+│   ├── category_provider.dart   # Quản lý danh mục
+│   └── product_provider.dart    # Quản lý sản phẩm & giỏ hàng
+│
+├── screens/                  # Màn hình chính
+│   ├── welcomepage.dart     # Màn hình chào mừng
+│   ├── login.dart          # Đăng nhập
+│   ├── signup.dart         # Đăng ký
+│   ├── homepage.dart       # Trang chủ
+│   ├── listproduct.dart    # Danh sách sản phẩm
+│   ├── detailpage.dart     # Chi tiết sản phẩm
+│   ├── cartpage.dart       # Giỏ hàng
+│   ├── checkout.dart       # Thanh toán
+│   ├── profilepage.dart    # Trang cá nhân
+│   └── search.dart         # Tìm kiếm
+│
+└── widgets/                 # Widgets tái sử dụng
+    ├── importProduct.dart    # Card sản phẩm
+    ├── importProductCart.dart # Card giỏ hàng
+    ├── mybutton.dart        # Button tùy chỉnh
+    ├── mytextformField.dart # Input fields
+    ├── passwordtextformField.dart # Password field
+    └── noficationShoppingcart.dart # Badge thông báo
 ```
 
-## Tính Năng Chính | Main Features
+## 🎯 Tính Năng Chi Tiết
 
-### 1. Xác Thực Người Dùng | User Authentication
-- Đăng nhập/Đăng ký với Firebase Auth
-- Quản lý phiên đăng nhập
-- Bảo mật thông tin người dùng
+### 1. Xác Thực & Quản Lý User
+- **Đăng nhập/Đăng ký**:
+  - Validation email và password
+  - Xử lý lỗi Firebase Auth
+  - Lưu thông tin user vào Firestore
 
-### 2. Quản Lý Sản Phẩm | Product Management
-- Hiển thị danh sách sản phẩm
-- Phân loại theo danh mục
-- Xem chi tiết sản phẩm
-- Tìm kiếm sản phẩm
+- **Quản lý Profile**:
+  - Upload ảnh đại diện (Cloudinary)
+  - Cập nhật thông tin cá nhân
+  - Chọn giới tính từ dropdown
+  - Hiển thị thông tin user
 
-### 3. Giỏ Hàng | Shopping Cart
-- Thêm/xóa sản phẩm
-- Quản lý số lượng
-- Tính tổng tiền
+### 2. Trang Chủ & Danh Mục
+- **Giao diện chính**:
+  - Carousel slider banner
+  - Danh mục sản phẩm
+  - Sản phẩm nổi bật & mới
+  - Navigation drawer
 
-### 4. Thanh Toán | Checkout
-- Quy trình thanh toán
-- Xác nhận đơn hàng
+- **Danh mục sản phẩm**:
+  - Áo (T-shirt, áo thun)
+  - Quần (Jeans, quần tây)
+  - Váy (Ngắn, dài)
+  - Giày (Sneakers)
+  - Đồng hồ
 
-## Công Nghệ Sử Dụng | Technologies Used
+### 3. Chức Năng Mua Sắm
+- **Chi tiết sản phẩm**:
+  - Hình ảnh sản phẩm với animation
+  - Chọn size (S/M/L/XL) với hiệu ứng
+  - Điều chỉnh số lượng
+  - Thêm vào giỏ hàng
+  - Validation khi chọn size
 
-- Flutter Framework
-- Firebase Authentication
-- Firebase Cloud Firestore
-- Provider State Management
+- **Giỏ hàng & Thanh toán**:
+  - Quản lý sản phẩm đã chọn
+  - Cập nhật/xóa số lượng
+  - Tính tổng tiền tự động
+  - Form thông tin giao hàng
+  - Xác nhận đơn hàng
 
-## Cài Đặt | Installation
+### 4. Tính Năng Khác
+- **Tìm kiếm**: 
+  - Tìm theo tên sản phẩm
+  - Hỗ trợ tìm kiếm không dấu
+  - Hiển thị kết quả tức thì
 
+- **Thông báo**:
+  - Badge hiển thị số lượng
+  - Thông báo thêm vào giỏ hàng
+
+## ⚙️ Công Nghệ Sử Dụng
+
+- **Frontend**:
+  - Flutter SDK
+  - Material Design
+  - Provider State Management
+
+- **Backend & Database**:
+  - Firebase Authentication
+  - Cloud Firestore
+  - Cloudinary Storage
+
+## 🚀 Cài Đặt & Chạy
+
+1. **Yêu cầu hệ thống**:
 ```bash
-# Clone dự án | Clone the repository
-git clone [repository-url]
+Flutter: ≥3.0.0
+Dart: ≥3.0.0
+```
 
-# Cài đặt dependencies | Install dependencies
+2. **Clone & Setup**:
+```bash
+git clone https://github.com/yourusername/dirty-coins.git
+cd dirty-coins
 flutter pub get
+```
 
-# Chạy ứng dụng | Run the app
+3. **Cấu hình Firebase**:
+- Tạo project Firebase mới
+- Thêm file cấu hình:
+  - `google-services.json` (Android)
+  - `GoogleService-Info.plist` (iOS)
+- Cập nhật `firebase_options.dart`
+
+4. **Chạy ứng dụng**:
+```bash
 flutter run
 ```
 
-## Cấu Hình Firebase | Firebase Setup
+## 👥 Tác Giả
+[Tên tác giả]
 
-1. Tạo dự án Firebase mới | Create new Firebase project
-2. Thêm ứng dụng Android/iOS | Add Android/iOS app
-3. Tải file cấu hình | Download config files:
-   - `google-services.json` cho Android
-   - `GoogleService-Info.plist` cho iOS
-4. Thêm file cấu hình vào dự án | Add config files to project
-
-## Đóng Góp | Contributing
-
-1. Fork dự án | Fork the project
-2. Tạo nhánh tính năng | Create feature branch
-3. Commit thay đổi | Commit changes
-4. Push lên nhánh | Push to branch
-5. Tạo Pull Request | Create Pull Request
-
-## Tác Giả | Author
-
-[Tên tác giả | Author name]
-
-## Giấy Phép | License
-
-MIT License
+## 📄 License
+MIT License - See [LICENSE](LICENSE) for details

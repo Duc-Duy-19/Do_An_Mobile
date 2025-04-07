@@ -129,7 +129,7 @@ flutter run
 ```
 
 ## 👥 Tác Giả
-[Tên tác giả]
+[Nguyễn Đức Duy]
 
 ## 📄 License
 MIT License - See [LICENSE](LICENSE) for details

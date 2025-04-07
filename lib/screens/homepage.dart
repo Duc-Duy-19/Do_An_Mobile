@@ -436,7 +436,7 @@ Widget _buildMyDrawer() {
       drawer: _buildMyDrawer(),
       //xay dung appbar
       appBar: AppBar(
-        title: Text('HomePage'),
+        title: Text('Dirty Coins'),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.0,

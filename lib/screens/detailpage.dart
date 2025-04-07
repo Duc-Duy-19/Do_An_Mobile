@@ -17,6 +17,7 @@ class Detailpage extends StatefulWidget {
     required this.name,
     required this.price,
     required this.description,
+    
   });
 
   @override

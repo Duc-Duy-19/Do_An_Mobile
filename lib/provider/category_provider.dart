@@ -29,6 +29,7 @@ class CategoryProvider with ChangeNotifier{
     .get();
     tshirtSnapshot.docs.forEach((element) {
       tshirtData = Product(
+        description: element['description'],
         image: element['image'],
         name: element['name'],
         price: element['price'].toDouble(),
@@ -51,6 +52,7 @@ class CategoryProvider with ChangeNotifier{
     .get();
     pantSnapshot.docs.forEach((element) {
       pantData = Product(
+        description: element['description'],
         image: element['image'],
         name: element['name'],
         price: element['price'].toDouble(),
@@ -73,6 +75,7 @@ class CategoryProvider with ChangeNotifier{
     .get();
     dressSnapshot.docs.forEach((element) {
       dressData = Product(
+        description: element['description'],
         image: element['image'],
         name: element['name'],
         price: element['price'].toDouble(),
@@ -95,6 +98,7 @@ class CategoryProvider with ChangeNotifier{
     .get();
     shoeSnapshot.docs.forEach((element) {
       shoeData = Product(
+        description: element['description'],
         image: element['image'],
         name: element['name'],
         price: element['price'].toDouble(),
@@ -117,6 +121,7 @@ class CategoryProvider with ChangeNotifier{
     .get();
     watchSnapshot.docs.forEach((element) {
       watchData = Product(
+        description: element['description'],
         image: element['image'],
         name: element['name'],
         price: element['price'].toDouble(),

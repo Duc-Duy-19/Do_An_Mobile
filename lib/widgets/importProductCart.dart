@@ -7,8 +7,9 @@ class ImportProductCart extends StatefulWidget {
   final String image;
   final double price;
   final bool isCount;
-  final int quantity; // Sửa quentity thành quantity
+  final int quantity;
   final int index;
+  final String size;
 
   const ImportProductCart({
     super.key,
@@ -18,6 +19,7 @@ class ImportProductCart extends StatefulWidget {
     required this.price,
     required this.index,
     this.isCount = true,
+    required this.size,
   });
 
   @override
@@ -28,71 +30,104 @@ class _ImportProductCartState extends State<ImportProductCart> {
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
-    // Lấy số lượng từ provider để đảm bảo dữ liệu luôn cập nhật
     int currentQuantity = productProvider.getCheckoutModelList[widget.index].quantity;
 
-    return Container(
-      height: 150,
-      width: double.infinity,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: Card(
-        child: Row(
-          children: <Widget>[
-            Container(
-              height: 130,
-              width: 140,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(widget.image),
-                  fit: BoxFit.contain,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 3,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: <Widget>[
+              // Ảnh sản phẩm
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  widget.image,
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            Container(
-              height: 140,
-              width: 200,
-              child: ListTile(
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              const SizedBox(width: 12),
+              // Thông tin sản phẩm
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(widget.name),
-                    const Text("Quần Áo"),
+                  children: [
+                    // Tên sản phẩm
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () {
+                            productProvider.deleteProductInCart(widget.index);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Text(
-                      "\$ ${widget.price.toString()}",
+                      "Size: ${widget.size}", // Hiển thị size thay vì "Quần Áo"
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "\$${widget.price.toStringAsFixed(2)}",
                       style: const TextStyle(
                         color: Colors.deepPurple,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 8),
                     widget.isCount
                         ? Container(
-                            height: 30,
-                            width: 100,
-                            color: Colors.grey[200],
+                            height: 32,
+                            width: 110,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
                                 GestureDetector(
-                                  child: const Icon(Icons.remove),
                                   onTap: () {
-                                    productProvider.updateQuantity(
-                                      widget.index,
-                                      currentQuantity - 1,
-                                    );
+                                    if (currentQuantity > 1) {
+                                      productProvider.updateQuantity(
+                                        widget.index,
+                                        currentQuantity - 1,
+                                      );
+                                    }
                                   },
+                                  child: const Icon(Icons.remove),
                                 ),
                                 Text(
                                   currentQuantity.toString(),
-                                  style: const TextStyle(fontSize: 18),
+                                  style: const TextStyle(fontSize: 16),
                                 ),
                                 GestureDetector(
-                                  child: const Icon(Icons.add),
                                   onTap: () {
                                     productProvider.updateQuantity(
                                       widget.index,
                                       currentQuantity + 1,
                                     );
                                   },
+                                  child: const Icon(Icons.add),
                                 ),
                               ],
                             ),
@@ -107,8 +142,8 @@ class _ImportProductCartState extends State<ImportProductCart> {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

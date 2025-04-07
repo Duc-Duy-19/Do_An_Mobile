@@ -21,12 +21,13 @@ class _SignUpState extends State<SignUp> {
   String username = "";
   String phoneNumber = "";
   bool isNam = true;
+  String address = "";
 
   static const String emailPattern =
       r'^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|hotmail\.com|outlook\.com)$';
   final RegExp emailRegExp = RegExp(emailPattern);
   
-
+  //luu dang ky vao firebase va hien thi thong bao
   Future<void> validation() async {
     final FormState? _form = _formKey.currentState;
     if (_form!.validate()) {
@@ -50,6 +51,7 @@ class _SignUpState extends State<SignUp> {
               "email": email,
               "gioitinh": isNam ? "Nam" : "Nữ",
               "phone": phoneNumber,
+              "address": address,
             });
         // Đăng ký thành công, hiển thị thông báo và chuyển hướng đến trang đăng nhập
         ScaffoldMessenger.of(context).showSnackBar(
@@ -133,8 +135,13 @@ class _SignUpState extends State<SignUp> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Username không được để trống';
-                            } else if (value.length < 6) {
-                              return 'Username phải lớn hơn 6 ký tự';
+                            } else if (value.length < 3) {
+                              return 'Username phải lớn hơn 3 ký tự';
+                            } else if (value.length > 20) {
+                              return 'Username không được quá 20 ký tự';
+                            }
+                            else if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                              return 'Username chỉ được chứa chữ cái, số và dấu gạch dưới';
                             }
                             return null;
                           },
@@ -199,6 +206,20 @@ class _SignUpState extends State<SignUp> {
                             return null;
                           },
                           onChanged: (value) => phoneNumber = value,
+                        ),
+                        MyTextFormField(
+                          name: "Địa chỉ",
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Địa chỉ không được để trống';
+                            } else if (value.length < 5) {
+                              return 'Địa chỉ phải lớn hơn 5 ký tự';
+                            } else if (value.length > 50) {
+                              return 'Địa chỉ không được quá 50 ký tự';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) => address = value,
                         ),
                       ],
                     ),

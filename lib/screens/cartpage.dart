@@ -75,6 +75,7 @@ class _CartPageState extends State<CartPage> {
           image: productProvider.getCheckoutModelList[index].image,
           quantity: productProvider.getCheckoutModelList[index].quantity,
           price: productProvider.getCheckoutModelList[index].price,
+          size: productProvider.getCheckoutModelList[index].size,
           index: index,
         ),
       ),

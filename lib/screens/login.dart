@@ -22,6 +22,8 @@ String email = "";
 String password = "";
 
 class _LoginState extends State<Login> {
+
+  //xay dung cac loai thong bao
   void vaildation() async {
     final FormState? _form = _formKey.currentState;
     if (_form!.validate()) {
@@ -74,7 +76,7 @@ class _LoginState extends State<Login> {
       }
     }
   }
-
+  /// Xây dựng các TextFormField và nút đăng nhập
   Widget _buildAlllTextFormFieldsAndButton() {
     return Container(
       width: double.infinity,
@@ -82,6 +84,10 @@ class _LoginState extends State<Login> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+            Container(
+              height: 120,
+              child: Image.asset("images/logo.png", fit: BoxFit.contain),
+            ),
           Text(
             'Đăng Nhập',
             style: TextStyle(

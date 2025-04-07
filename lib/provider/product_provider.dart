@@ -1,40 +1,85 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:do_an_mobile/model/cartmodel.dart';
 import 'package:do_an_mobile/model/product.dart';
 import 'package:do_an_mobile/model/usermodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
 
 class ProductProvider with ChangeNotifier {
   
+  void deleteProductInCart(int index){
+    checkOutModelList.removeAt(index);
+    notifyListeners();
+  }
+
+   
+  void clearProductInCart(){
+    checkOutModelList.clear();
+    notifyListeners();
+  }
+  
+  
   List<UserModel> UsermodeList = [];
   UserModel? userModel;
+
   Future<void> getUserData() async {
     List<UserModel> newList = [];
-    User currenUser = FirebaseAuth.instance.currentUser!;
-    QuerySnapshot userSnapshot = await FirebaseFirestore.instance
-        .collection("users")
-        .get();
+    User currentUser = FirebaseAuth.instance.currentUser!;
+    QuerySnapshot userSnapshot =
+        await FirebaseFirestore.instance.collection("users").get();
     userSnapshot.docs.forEach((element) {
-      if(currenUser.uid == element['usererId']){
+      if (currentUser.uid == element['usererId'] && element.exists) {
+        final data = element.data() as Map<String, dynamic>?;
         userModel = UserModel(
+          address: element['address'],
           username: element['username'],
           email: element['email'],
           phone: element['phone'],
           gioitinh: element['gioitinh'],
+          profileImageUrl: data?.containsKey('profileImageUrl') == true
+              ? element['profileImageUrl']
+              : null,
         );
         newList.add(userModel!);
       }
-      UsermodeList = newList;
-      
     });
+    UsermodeList = newList;
     notifyListeners();
   }
+
   List<UserModel> get getUserModel {
     return UsermodeList;
   }
-  
 
+  Future<void> uploadImageToCloudinaryAndSave(File imageFile) async {
+    try {
+      if (!imageFile.existsSync()) {
+        print("Error: Image file does not exist at ${imageFile.path}");
+        return;
+      }
+
+      final cloudinary = CloudinaryPublic('dqh8kyxgt', 'UploadHinh_DoAnMoBile');
+      CloudinaryResponse uploadResult = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(imageFile.path),
+      );
+      String imageUrl = uploadResult.secureUrl;
+
+      User currentUser = FirebaseAuth.instance.currentUser!;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUser.uid)
+          .update({
+        "profileImageUrl": imageUrl,
+      });
+
+      await getUserData();
+      notifyListeners();
+    } catch (e) {
+      print("Error uploading image: $e");
+    }
+  }
 
   List<Cartmodel> cartModelList = [];
   late Cartmodel cartModel;
@@ -45,14 +90,16 @@ class ProductProvider with ChangeNotifier {
   void getCheckOutCartData({
     required String name,
     required String image,
-    required int quantity, // Sửa quentity thành quantity
+    required int quantity,
     required double price,
+    required String size,
   }) {
     checkOutModel = Cartmodel(
       name: name,
       image: image,
       price: price,
       quantity: quantity,
+      size: size,
     );
     checkOutModelList.add(checkOutModel);
     notifyListeners();
@@ -72,15 +119,13 @@ class ProductProvider with ChangeNotifier {
         name: checkOutModelList[index].name,
         image: checkOutModelList[index].image,
         price: checkOutModelList[index].price,
-        quantity: newQuantity, // Sửa quentity thành quantity
+        quantity: newQuantity,
+        size: checkOutModelList[index].size,
       );
       notifyListeners();
     }
   }
 
-
-
-  // Các phương thức còn lại của ProductProvider
   List<Product> featureproduct = [];
   Product? featureproductData;
   Future<void> getFeatureproductData() async {
@@ -114,10 +159,11 @@ class ProductProvider with ChangeNotifier {
     QuerySnapshot newSnapshot = await FirebaseFirestore.instance
         .collection("product")
         .doc("1HgSL0xNRTgFI2sM7Dtb")
-        .collection("featureproduct")
+        .collection("newproduct")
         .get();
     newSnapshot.docs.forEach((element) {
       newproductData = Product(
+        description: element['description'],
         image: element['image'],
         name: element['name'],
         price: element['price'].toDouble(),
@@ -163,6 +209,7 @@ class ProductProvider with ChangeNotifier {
         await FirebaseFirestore.instance.collection("homenew").get();
     newSnapshot.docs.forEach((element) {
       homenewproductData = Product(
+        description: element['description'],
         image: element['image'],
         name: element['name'],
         price: element['price'].toDouble(),

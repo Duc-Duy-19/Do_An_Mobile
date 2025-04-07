@@ -8,6 +8,7 @@ import 'package:do_an_mobile/screens/detailpage.dart';
 import 'package:do_an_mobile/screens/listproduct.dart';
 import 'package:do_an_mobile/screens/login.dart';
 import 'package:do_an_mobile/screens/profilepage.dart';
+import 'package:do_an_mobile/screens/search.dart';
 import 'package:do_an_mobile/screens/welcomepage.dart';
 import 'package:do_an_mobile/widgets/importProduct.dart';
 import 'package:do_an_mobile/widgets/noficationShoppingcart.dart';
@@ -25,6 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
 
+  //hinh anh carousel
   final List<String> carouselImages = [
     'images/aotetdra.jpg',
     'images/ao7dra.jpg',
@@ -55,7 +57,7 @@ class _HomePageState extends State<HomePage> {
     productProvider.getUserData();
   }
 
-  // Widget
+  //xau dung incon danh muc
   Widget _buildCategoryProduct({required String image, required int color}) {
     return CircleAvatar(
       maxRadius: 30,
@@ -67,10 +69,10 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
+//xay dung thong tin tai khoan o trong drawer
 Widget _buidUserAcountDrawer() {
   final productProvider = Provider.of<ProductProvider>(context);
-  List<UserModel> userModel = productProvider.UsermodeList;
+  List<UserModel> userModel = productProvider.getUserModel;
 
   return Column(
     children: userModel.isEmpty
@@ -82,8 +84,10 @@ Widget _buidUserAcountDrawer() {
   : userModel.map((e) {
       return UserAccountsDrawerHeader(
         currentAccountPicture: CircleAvatar(
-          backgroundImage: AssetImage("images/hinhuser.jpg"),
-        ),
+                backgroundImage: e.profileImageUrl != null
+                    ? NetworkImage(e.profileImageUrl!) // Sử dụng ảnh từ Cloudinary
+                    : AssetImage("images/hinhuser.jpg") as ImageProvider, // Ảnh mặc định nếu không có URL
+              ),
         decoration: BoxDecoration(
           color: Colors.black,
         ),
@@ -97,7 +101,7 @@ Widget _buidUserAcountDrawer() {
   );
 }
 
-
+//xay dung drawer
 Widget _buildMyDrawer() {
   final productProvider = Provider.of<ProductProvider>(context);
   final userModel = productProvider.getUserModel;
@@ -105,7 +109,8 @@ Widget _buildMyDrawer() {
   return Drawer(
     child: Column(
       children: <Widget>[
-        _buidUserAcountDrawer(),
+        _buidUserAcountDrawer(), //xay dung thong tin tai khoan o trong drawer
+        
         ListTile(
           selected: homeColor,
           onTap: () {
@@ -115,6 +120,11 @@ Widget _buildMyDrawer() {
               AboutColor = false;
               profileColor = false;
             });
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => HomePage(),
+              ),
+            );
           },
           leading: Icon(Icons.home),
           title: Text("Home"),
@@ -146,6 +156,11 @@ Widget _buildMyDrawer() {
               AboutColor = false;
               profileColor = false;
             });
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => CartPage(),
+              ),
+            );
           },
           leading: Icon(Icons.shopping_cart),
           title: Text("Giỏ Hàng"),
@@ -166,6 +181,7 @@ Widget _buildMyDrawer() {
         ListTile(
           onTap: () async {
             await FirebaseAuth.instance.signOut();
+            if (!mounted) return;
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => Welcomepage()),
               (Route<dynamic> route) => false,
@@ -179,7 +195,7 @@ Widget _buildMyDrawer() {
   );
 }
 
-
+  //xay dung danh muc
   Widget _buildCategory(BuildContext context) {
     final categoryProvider = Provider.of<CategoryProvider>(context);
     List<Product> tshirt = categoryProvider.getTshirtList;
@@ -285,7 +301,7 @@ Widget _buildMyDrawer() {
       ],
     );
   }
-
+  //xay dung danh sach san pham noi bat
   Widget _buildFeatured(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
     List<Product> featureProduct = productProvider.getFeatureList;
@@ -348,7 +364,7 @@ Widget _buildMyDrawer() {
       ],
     );
   }
-
+  //xay dung danh sach san pham moi
   Widget _buildNew(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
     List<Product> newProduct = productProvider.getNewList;
@@ -393,7 +409,7 @@ Widget _buildMyDrawer() {
                           image: e.image,
                           name: e.name,
                           price: e.price,
-                          description: e.description??"asd" , // Added description parameter
+                          description: e.description ?? "No description available" , // Added description parameter
                         ),
                       ),
                     );
@@ -412,11 +428,13 @@ Widget _buildMyDrawer() {
     );
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _key,
       drawer: _buildMyDrawer(),
+      //xay dung appbar
       appBar: AppBar(
         title: Text('HomePage'),
         centerTitle: true,
@@ -427,14 +445,38 @@ Widget _buildMyDrawer() {
           onPressed: () => _key.currentState!.openDrawer(),
         ),
         actions: [
-          IconButton(icon: Icon(Icons.search, color: Colors.black), onPressed: () {}),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () async {
+              final productProvider = Provider.of<ProductProvider>(context, listen: false);
+              final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+              await showSearch(
+                context: context,
+                delegate: ProductSearch(
+                  allProducts: [
+                    ...categoryProvider.getDressList,
+                    ...categoryProvider.getPantList,
+                    ...categoryProvider.getShoeList,
+                    ...categoryProvider.getTshirtList,
+                    ...categoryProvider.getWatchList,
+                    ...productProvider.getHomeNewList,
+                    ...productProvider.getHomeFeatureList,
+                    ...productProvider.getNewList,
+                    ...productProvider.getFeatureList,
+                  ],
+                ),
+              );
+            },
+          ),
           NoficationShoppingCart(),
         ],
       ),
+      //xa dung body
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
           children: <Widget>[
+            //xay dung carousel
             CarouselSlider(
               options: CarouselOptions(
                 height: 180,
